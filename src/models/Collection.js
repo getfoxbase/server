@@ -3,7 +3,8 @@ import Types from '../types'
 
 class Collection {
   static clear (name) {
-    mongoose.deleteModel(name)
+    const protectedModels = ['_collections']
+    if (protectedModels.includes(name) === false) mongoose.deleteModel(name)
   }
 
   static async get (name) {

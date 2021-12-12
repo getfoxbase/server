@@ -1,4 +1,4 @@
-export default class UserCollections {
+export default class Collections {
   static async list (request, reply) {
     return 'ok'
   }
