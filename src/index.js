@@ -1,8 +1,7 @@
 import mongoose from 'mongoose'
-import fastifyIo from 'fastify-socket.io'
-import fastifyCors from 'fastify-cors'
-import fastifyFileUpload from 'fastify-file-upload'
 import qs from 'qs'
+import setupRoutes from './routes'
+import { setupSocket } from './socket'
 
 // Load environment variables from .env file
 require('dotenv').config()
@@ -13,29 +12,32 @@ const app = require('fastify')({
   querystringParser: str => qs.parse(str)
 })
 
-app.register(fastifyCors, {
-  origin: true,
+// Register Socket.IO
+app.register(require('fastify-socket.io'), {
+  cors: {
+    origin: process.env.RESTRICT_DOMAIN || true,
+    methods: ['GET', 'POST']
+  }
+})
+
+// Setup cross origin restrictions
+app.register(require('fastify-cors'), {
+  origin: process.env.RESTRICT_DOMAIN || true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 })
 
-app.register(fastifyFileUpload)
-
-// Setup routes
-// Setup sockets
+// Setup file uploading
+app.register(require('fastify-file-upload'))
 
 const start = async _ => {
   try {
     await mongoose.connect(process.env.MONGO_DSN)
-    mongoose.model('user', {
-      email: String
-    })
-    mongoose.deleteModel('user')
-    mongoose.model('user', {
-      email: String
-    })
+    // Setup routes
+    setupRoutes(app)
 
+    // Setup sockets
+    setupSocket(app)
     await app.ready()
-
     await app.listen(process.env.PORT ?? 80)
   } catch (err) {
     app.log.error(err)

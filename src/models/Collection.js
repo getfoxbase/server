@@ -1,4 +1,4 @@
-import mongoose, { Schema, Mixed } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 import Types from '../types'
 
 class Collection {
@@ -137,16 +137,16 @@ const schema = new Schema(
           default: false
         },
         default: {
-          type: Mixed
+          type: mongoose.Mixed
         },
         min: {
-          type: Mixed
+          type: mongoose.Mixed
         },
         max: {
-          type: Mixed
+          type: mongoose.Mixed
         },
         enum: {
-          type: [Mixed]
+          type: [mongoose.Mixed]
         },
         minLength: {
           type: Number
