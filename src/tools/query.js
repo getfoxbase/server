@@ -29,7 +29,7 @@ export default function (request, collection) {
         if (search === null) search = []
         for (const searchQuery of val) {
           for (const searchField of collection.getSearchFields()) {
-            let o = {}
+            o = {}
             o[searchField] = {
               $regex: searchQuery,
               $options: 'i'
@@ -66,7 +66,7 @@ export default function (request, collection) {
         if (geoFields.includes(geoField) === false)
           throw new Error(`"${key[2]}" is not a valid latlng field.`)
 
-        const o = {}
+        o = {}
         o[geoField] = {
           $nearSphere: {
             $geometry: LatLng.in(val),
