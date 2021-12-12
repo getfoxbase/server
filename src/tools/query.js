@@ -3,7 +3,7 @@ import LatLng from '../types/LatLng'
 export default function (request, collection) {
   let page = 1
   let limit = 20
-  let query = {}
+  let query = []
   let search = null
   let sort = undefined
 
@@ -64,13 +64,15 @@ export default function (request, collection) {
         if (geoFields.includes(geoField) === false)
           throw new Error(`"${key[2]}" is not a valid latlng field.`)
 
-        query[geoField] = {
+        const o = {}
+        o[geoField] = {
           $nearSphere: {
             $geometry: LatLng.in(val),
             $minDistance: min,
             $maxDistance: max
           }
         }
+        query.push(o)
         break
       case 'geoWithin':
         if (!collection.canBeGeoSearched())
@@ -123,7 +125,8 @@ export default function (request, collection) {
             throw new Error(`"${type}" geo type search is not supported.`)
         }
 
-        query[geoField] = {
+        const o = {}
+        o[geoField] = {
           $geoWithin: {
             $geometry: {
               type: 'Polygon',
@@ -131,26 +134,54 @@ export default function (request, collection) {
             }
           }
         }
+        query.push(o)
         break
       default:
-        val = collection.formatIn(key[1], val)
-        if (val === null) break
-        switch (key[2]) {
-          case 'ne':
-          case 'gt':
-          case 'gte':
-          case 'lt':
-          case 'lte':
-            const o = {}
-            o[`$${key[2]}`] = val
-            query[key[1]] = o
-            break
-          case 'eq':
-          default:
-            query[key[1]] = val
-            break
+        for (const currentVal of val) {
+          currentVal = collection.formatIn(key[1], currentVal)
+          if (currentVal === null) break
+          switch (key[2] ?? 'eq') {
+            case 'eq':
+            case 'ne':
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte':
+              const o = {}
+              o[key[1]] = {}
+              o[key[1]][`$${key[2]}`] = currentVal
+              query.push(o)
+              break
+            case 'in':
+              const o = {}
+              o[key[1]] = {
+                $in: currentVal.split(',')
+              }
+              query.push(o)
+              break
+            case 'contains':
+              const o = {}
+              o[key[1]] = {
+                $regex: currentVal,
+                $options: 'i'
+              }
+              query.push(o)
+              break
+            default:
+              throw new Error(`Unknown operator "${key[2]}"`)
+          }
         }
         break
+    }
+  }
+
+  if (query.length === 0) {
+    query = {}
+  } else if (query.length === 1) {
+    query = query[0]
+  } else {
+    query = {
+      $and: query
     }
   }
 
