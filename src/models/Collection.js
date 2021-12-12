@@ -2,7 +2,7 @@ import mongoose, { Schema, Mixed } from 'mongoose'
 import Types from '../types'
 
 class Collection {
-  static deleteModel (name) {
+  static clear (name) {
     mongoose.deleteModel(name)
   }
 
@@ -66,6 +66,12 @@ class Collection {
       return ret
     }
 
+    schema.statics.formatIn = function (key, value) {
+      if (conf.fields[key] === undefined) return null
+
+      return Types[conf.fields[key].type].in(value)
+    }
+
     schema.statics.canBeGeoSearched = function () {
       for (let key in conf.fields ?? {}) {
         if (conf.fields[key].type === 'latlng') return true
@@ -81,66 +87,24 @@ class Collection {
       return ret
     }
 
-    return mongoose.model(name, schema)
-  }
-}
+    schema.statics.getSearchFields = function () {
+      const ret = []
+      for (let key in conf.fields ?? {}) {
+        if (conf.fields[key].searchable) ret.push(key)
+      }
+      return ret
+    }
 
-const configurationFields = {
-  type: {
-    type: String,
-    enum: Object.keys(Types)
-  },
-  unique: {
-    type: Boolean,
-    default: false
-  },
-  index: {
-    type: Boolean,
-    default: false
-  },
-  required: {
-    type: Boolean,
-    default: false
-  },
-  default: {
-    type: Mixed
-  },
-  min: {
-    type: Mixed
-  },
-  max: {
-    type: Mixed
-  },
-  enum: {
-    type: [Mixed]
-  },
-  minLength: {
-    type: Number
-  },
-  maxLength: {
-    type: Number
-  },
-  match: {
-    type: new Schema({
-      regex: String,
-      flags: String
+    schema.plugin(require('mongoose-autopopulate'))
+    schema.plugin(require('mongoose-paginate-v2'))
+    schema.plugin(require('mongoose-delete'), {
+      deletedAt: true,
+      deletedBy: true,
+      overrideMethods: true,
+      indexFields: ['deleted', 'deletedBy']
     })
-  },
-  lowercase: {
-    type: Boolean
-  },
-  uppercase: {
-    type: Boolean
-  },
-  trim: {
-    type: Boolean
-  }
-}
 
-for (let typeName in Types) {
-  const confs = Types[typeName].getConfigurationFields()
-  for (let confKey in confs) {
-    configurationFields[confKey] = confs[confKey]
+    return mongoose.model(name, schema)
   }
 }
 
@@ -149,13 +113,67 @@ const schema = new Schema(
     name: {
       type: String,
       required: true,
-      match: /^[a-z_0-9]+$/,
+      match: /^[a-z_0-9]+$/i,
       unique: true,
       trim: true
     },
     fields: {
       type: Map,
-      of: new Schema(configurationFields)
+      of: new Schema({
+        type: {
+          type: String,
+          enum: Object.keys(Types)
+        },
+        unique: {
+          type: Boolean,
+          default: false
+        },
+        index: {
+          type: Boolean,
+          default: false
+        },
+        required: {
+          type: Boolean,
+          default: false
+        },
+        default: {
+          type: Mixed
+        },
+        min: {
+          type: Mixed
+        },
+        max: {
+          type: Mixed
+        },
+        enum: {
+          type: [Mixed]
+        },
+        minLength: {
+          type: Number
+        },
+        maxLength: {
+          type: Number
+        },
+        match: {
+          type: new Schema({
+            regex: String,
+            flags: String
+          })
+        },
+        lowercase: {
+          type: Boolean
+        },
+        uppercase: {
+          type: Boolean
+        },
+        trim: {
+          type: Boolean
+        },
+        searchable: {
+          type: Boolean,
+          default: false
+        }
+      })
     }
   },
   {
@@ -165,13 +183,5 @@ const schema = new Schema(
 )
 
 schema.loadClass(Collection)
-schema.plugin(require('mongoose-autopopulate'))
-schema.plugin(require('mongoose-paginate-v2'))
-schema.plugin(require('mongoose-delete'), {
-  deletedAt: true,
-  deletedBy: true,
-  overrideMethods: true,
-  indexFields: ['deleted', 'deletedBy']
-})
 
 export default mongoose.model('_collections', schema)

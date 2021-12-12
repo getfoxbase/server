@@ -2,13 +2,16 @@ import mongoose from 'mongoose'
 import fastifyIo from 'fastify-socket.io'
 import fastifyCors from 'fastify-cors'
 import fastifyFileUpload from 'fastify-file-upload'
-import fastify from 'fastify'
+import qs from 'qs'
 
 // Load environment variables from .env file
 require('dotenv').config()
 
 // Create fastify instance
-const app = require('fastify')({ logger: process.env.DEBUG === 'true' })
+const app = require('fastify')({
+  logger: process.env.DEBUG === 'true',
+  querystringParser: str => qs.parse(str)
+})
 
 app.register(fastifyCors, {
   origin: true,
