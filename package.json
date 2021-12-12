@@ -22,6 +22,7 @@
     "pino-pretty": "^7.2.0"
   },
   "dependencies": {
+    "dayjs": "^1.10.7",
     "dotenv": "^10.0.0",
     "fastify": "^3.24.1",
     "fastify-cors": "^6.0.2",

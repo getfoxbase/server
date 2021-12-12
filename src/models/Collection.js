@@ -24,7 +24,11 @@ class Collection {
     for (let key in conf.fields ?? {}) {
       schemaConf[key] = {
         ...conf.fields[key],
-        type: Types[conf.fields[key].type].getMongooseType()
+        type: Types[conf.fields[key].type].getMongooseType(),
+        index:
+          Types[conf.fields[key].type].getMongooseIndex() ??
+          conf.fields[key].index ??
+          false
       }
     }
 
@@ -46,7 +50,7 @@ class Collection {
       for (let key in data) {
         if (conf.fields[key] === undefined) continue
 
-        this.set(key, await Types[conf.fields[key].type].in(data[key]))
+        this.set(key, Types[conf.fields[key].type].in(data[key]))
       }
     }
 
@@ -56,7 +60,7 @@ class Collection {
       for (let key in conf.fields ?? {}) {
         if (filter instanceof Array && filter.includes(key)) continue
 
-        ret[key] = await Types[conf.fields[key].type].out(this.get(key))
+        ret[key] = Types[conf.fields[key].type].out(this.get(key))
       }
 
       return ret
@@ -85,6 +89,36 @@ const configurationFields = {
   },
   default: {
     type: Mixed
+  },
+  min: {
+    type: Mixed
+  },
+  max: {
+    type: Mixed
+  },
+  enum: {
+    type: [Mixed]
+  },
+  minLength: {
+    type: Number
+  },
+  maxLength: {
+    type: Number
+  },
+  match: {
+    type: new Schema({
+      regex: String,
+      flags: String
+    })
+  },
+  lowercase: {
+    type: Boolean
+  },
+  uppercase: {
+    type: Boolean
+  },
+  trim: {
+    type: Boolean
   }
 }
 

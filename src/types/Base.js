@@ -1,9 +1,13 @@
 export default class Base {
-  static async in (value) {
+  static in (value) {
     return value
   }
 
-  static async out (value) {
+  static out (value) {
     return value
+  }
+
+  static getMongooseIndex () {
+    return null
   }
 }
