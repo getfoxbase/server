@@ -5,19 +5,49 @@ class Role {
     return await this.findOne({ slug }).exec()
   }
 
+  static async getDefaultUserRole () {
+    return await this.findOne({ defaultUserRole: true }).exec()
+  }
+
+  static async getDefaultAnonymousRole () {
+    return await this.findOne({ defaultAnonymousRole: true }).exec()
+  }
+
   static async ensureBasicRoles () {
     await this.ensureRole('admin', {
       name: 'Admin',
-      anonymous: false,
       allAccess: true,
       collections: {},
       deletable: false
     })
+    await this.ensureRole('user', {
+      name: 'User',
+      defaultUserRole: true,
+      allAccess: false,
+      collections: {
+        _users: {
+          read: false,
+          write: false,
+          delete: false,
+          author: true,
+          admin: false
+        }
+      },
+      deletable: false
+    })
     await this.ensureRole('anonymous', {
       name: 'Anonymous',
-      anonymous: true,
+      defaultAnonymousRole: true,
       allAccess: false,
-      collections: {},
+      collections: {
+        _users: {
+          read: false,
+          write: false,
+          delete: false,
+          author: true,
+          admin: false
+        }
+      },
       deletable: false
     })
   }
@@ -51,7 +81,11 @@ const schema = new Schema(
       unique: true,
       trim: true
     },
-    anonymous: {
+    defaultAnonymousRole: {
+      type: Boolean,
+      default: false
+    },
+    defaultUserRole: {
       type: Boolean,
       default: false
     },
@@ -79,6 +113,10 @@ const schema = new Schema(
           default: false
         },
         author: {
+          type: Boolean,
+          default: false
+        },
+        admin: {
           type: Boolean,
           default: false
         }

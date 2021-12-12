@@ -1,3 +1,4 @@
+import Role from '../models/Role'
 import User from '../models/User'
 
 export default async function (req, res) {
@@ -20,5 +21,11 @@ export default async function (req, res) {
   if (req.user && req.user.lang !== req.lang) {
     req.user.lang = req.lang
     await req.user.save()
+  }
+
+  if (req.user) {
+    req.role = await req.user.getRole()
+  } else {
+    req.role = await Role.getDefaultAnonymousRole()
   }
 }

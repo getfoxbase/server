@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { v4 as uuid } from 'uuid'
 import langs from '../conf/langs'
 import { $t, getDefaultLang } from '../tools/i18n'
+import Role from './Role'
 
 const SALT_WORK_FACTOR = 10
 
@@ -82,6 +83,7 @@ class User {
         $t('Email is already used by another account. Try to sign in.', lang)
       )
     }
+
     const user = new this({
       email,
       firstname,
@@ -91,6 +93,9 @@ class User {
     })
 
     await user.save()
+    user._author = user._id
+    await user.save()
+
     return user
   }
 
@@ -155,7 +160,11 @@ class User {
     return null
   }
 
-  export (requestingUser) {
+  async getRole () {
+    return await Role.getRole(this.role)
+  }
+
+  export () {
     let ret = {
       id: this.id,
       role: this.role,
@@ -174,6 +183,9 @@ class User {
 
 const schema = new Schema(
   {
+    _author: {
+      type: mongoose.ObjectId
+    },
     email: {
       type: String,
       match: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i,

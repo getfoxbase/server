@@ -4,14 +4,7 @@ import buildQuery from '@/tools/query'
 
 export default class UsersController {
   static async list (request, reply) {
-    if (this.checkAuth(request, reply)) return
-
-    if (!request.user.admin) {
-      reply
-        .code(403)
-        .send(new Error($t('You cannot access this resource', request.lang)))
-      return
-    }
+    if (this.checkAccess(request, reply, '_users', 'read')) return
 
     try {
       const { page, limit, query, sort } = buildQuery(request)
@@ -21,7 +14,7 @@ export default class UsersController {
         sort
       })
 
-      users.docs = users.docs.map(doc => doc.export(request.user))
+      users.docs = users.docs.map(doc => doc.export())
 
       reply.send(users)
     } catch (err) {
@@ -30,8 +23,6 @@ export default class UsersController {
   }
 
   static async get (request, reply) {
-    if (this.checkAuth(request, reply)) return
-
     if (request.user.id !== request.params.userId && !request.user.admin) {
       reply
         .code(403)
@@ -43,8 +34,10 @@ export default class UsersController {
       const user = await User.findById(request.params.userId).exec()
       if (!user) {
         reply.code(404).send(new Error($t('Resource not found', request.lang)))
-      } else {
-        reply.send(user.export(request.user))
+      } else if (this.checkAccess(request, reply, '_users', 'read', user))
+        return
+      else {
+        reply.send(user.export())
       }
     } catch (err) {
       throw err
@@ -53,10 +46,12 @@ export default class UsersController {
 
   static async me (request, reply) {
     if (this.checkAuth(request, reply)) return
-    return request.user.export(request.user)
+    return request.user.export()
   }
 
   static async create (request, reply) {
+    if (this.checkAccess(request, reply, '_users', 'write')) return
+
     const user = await User.createUser(
       request.body.email,
       request.body.firstname,
@@ -80,21 +75,14 @@ export default class UsersController {
   }
 
   static async edit (request, reply) {
-    if (this.checkAuth(request, reply)) return
-
-    if (request.user.id !== request.params.userId && !request.user.admin) {
-      reply
-        .code(403)
-        .send(new Error($t('You cannot access this resource', request.lang)))
-      return
-    }
-
     try {
       const user = await User.findById(request.params.userId)
       if (!user) {
         reply.code(404).send(new Error($t('Resource not found', request.lang)))
         return
       }
+
+      if (this.checkAccess(request, reply, '_users', 'write', user)) return
 
       for (let key in request.body) {
         if (key === 'admin' && !request.user.admin) continue
@@ -123,21 +111,14 @@ export default class UsersController {
   }
 
   static async delete (request, reply) {
-    if (this.checkAuth(request, reply)) return
-
-    if (request.user.id !== request.params.userId && !request.user.admin) {
-      reply
-        .code(403)
-        .send(new Error($t('You cannot access this resource', request.lang)))
-      return
-    }
-
     try {
       const user = await User.findById(request.params.userId)
       if (!user) {
         reply.code(404).send(new Error($t('Resource not found', request.lang)))
         return
       }
+
+      if (this.checkAccess(request, reply, '_users', 'delete', user)) return
 
       await user.delete(request.user._id)
 
