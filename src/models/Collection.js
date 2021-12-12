@@ -66,6 +66,21 @@ class Collection {
       return ret
     }
 
+    schema.statics.canBeGeoSearched = function () {
+      for (let key in conf.fields ?? {}) {
+        if (conf.fields[key].type === 'latlng') return true
+      }
+      return false
+    }
+
+    schema.statics.getGeoFields = function () {
+      const ret = []
+      for (let key in conf.fields ?? {}) {
+        if (conf.fields[key].type === 'latlng') ret.push(key)
+      }
+      return ret
+    }
+
     return mongoose.model(name, schema)
   }
 }
