@@ -1,5 +1,19 @@
-import Text from './Text'
+import BooleanType from './Boolean'
+import DateType from './Date'
+import DecimalType from './Decimal'
+import FloatType from './Float'
+import I18nTextType from './I18nText'
+import IntegerType from './Integer'
+import LatLngType from './LatLng'
+import TextType from './Text'
 
 export default {
-  text: Text
+  boolean: BooleanType,
+  date: DateType,
+  decimal: DecimalType,
+  float: FloatType,
+  'i18n-text': I18nTextType,
+  integer: IntegerType,
+  latlng: LatLngType,
+  text: TextType
 }

@@ -17,4 +17,16 @@ export default class Collections {
   static async delete (request, reply) {
     return 'ok'
   }
+  static async listRelation (request, reply) {
+    return 'ok'
+  }
+  static async createRelation (request, reply) {
+    return 'ok'
+  }
+  static async getRelation (request, reply) {
+    return 'ok'
+  }
+  static async deleteRelation (request, reply) {
+    return 'ok'
+  }
 }

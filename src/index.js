@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import qs from 'qs'
+import Role from './models/Role'
 import setupRoutes from './routes'
 import { setupSocket } from './socket'
 
@@ -32,6 +33,10 @@ app.register(require('fastify-file-upload'))
 const start = async _ => {
   try {
     await mongoose.connect(process.env.MONGO_DSN)
+
+    // Ensure basic roles
+    await Role.ensureBasicRoles()
+
     // Setup routes
     setupRoutes(app)
 

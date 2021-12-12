@@ -3,7 +3,7 @@ import Types from '../types'
 
 class Collection {
   static clear (name) {
-    const protectedModels = ['_collections']
+    const protectedModels = ['_collections', '_users', '_roles']
     if (protectedModels.includes(name) === false) mongoose.deleteModel(name)
   }
 
@@ -21,11 +21,16 @@ class Collection {
       return undefined
     }
 
-    const schemaConf = {}
+    const schemaConf = {
+      _author: {
+        type: mongoose.ObjectId
+      }
+    }
     for (let key in conf.fields ?? {}) {
       schemaConf[key] = {
         ...conf.fields[key],
         type: Types[conf.fields[key].type].getMongooseType(),
+        of: Types[conf.fields[key].type].getMongooseOf(),
         index:
           Types[conf.fields[key].type].getMongooseIndex() ??
           conf.fields[key].index ??
@@ -40,6 +45,7 @@ class Collection {
 
     schema.methods.applyValues = async function (
       data,
+      request,
       eraseEverything = false
     ) {
       if (eraseEverything) {
@@ -51,26 +57,26 @@ class Collection {
       for (let key in data) {
         if (conf.fields[key] === undefined) continue
 
-        this.set(key, Types[conf.fields[key].type].in(data[key]))
+        this.set(key, Types[conf.fields[key].type].in(data[key], request))
       }
     }
 
-    schema.methods.export = async function (filter = null) {
+    schema.methods.export = async function (request, filter = null) {
       let ret = {}
 
       for (let key in conf.fields ?? {}) {
         if (filter instanceof Array && filter.includes(key)) continue
 
-        ret[key] = Types[conf.fields[key].type].out(this.get(key))
+        ret[key] = Types[conf.fields[key].type].out(this.get(key), request)
       }
 
       return ret
     }
 
-    schema.statics.formatIn = function (key, value) {
+    schema.statics.formatIn = function (key, value, request) {
       if (conf.fields[key] === undefined) return null
 
-      return Types[conf.fields[key].type].in(value)
+      return Types[conf.fields[key].type].in(value, request)
     }
 
     schema.statics.canBeGeoSearched = function () {
@@ -117,6 +123,9 @@ const schema = new Schema(
       match: /^[a-z_0-9]+$/i,
       unique: true,
       trim: true
+    },
+    _author: {
+      type: mongoose.ObjectId
     },
     fields: {
       type: Map,

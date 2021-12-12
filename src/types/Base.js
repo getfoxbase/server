@@ -10,4 +10,12 @@ export default class Base {
   static getMongooseIndex () {
     return null
   }
+
+  static getMongooseType () {
+    return String
+  }
+
+  static getMongooseOf () {
+    return undefined
+  }
 }

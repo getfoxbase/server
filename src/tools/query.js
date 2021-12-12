@@ -6,6 +6,9 @@ export default function (request, collection) {
   let query = []
   let search = null
   let sort = undefined
+  let geoField = null
+  let geoFields = collection.getGeoFields()
+  let o = {}
 
   for (let key in request.query) {
     let val = request.query[key]
@@ -41,7 +44,7 @@ export default function (request, collection) {
 
         val = val[0]
 
-        let geoField = null
+        geoField = null
         let min = 0
         let max = 20000
 
@@ -60,7 +63,6 @@ export default function (request, collection) {
           }
         })
 
-        let geoFields = collection.getGeoFields()
         if (geoFields.includes(geoField) === false)
           throw new Error(`"${key[2]}" is not a valid latlng field.`)
 
@@ -80,7 +82,7 @@ export default function (request, collection) {
 
         val = val[0]
 
-        let geoField = null
+        geoField = null
         let type = 'polygon'
 
         ;(key[2] ?? '').split(';').forEach(geoConf => {
@@ -95,7 +97,6 @@ export default function (request, collection) {
           }
         })
 
-        let geoFields = collection.getGeoFields()
         if (geoFields.includes(geoField) === false)
           throw new Error(`"${key[2]}" is not a valid latlng field.`)
 
@@ -125,7 +126,7 @@ export default function (request, collection) {
             throw new Error(`"${type}" geo type search is not supported.`)
         }
 
-        const o = {}
+        o = {}
         o[geoField] = {
           $geoWithin: {
             $geometry: {
@@ -138,7 +139,7 @@ export default function (request, collection) {
         break
       default:
         for (const currentVal of val) {
-          currentVal = collection.formatIn(key[1], currentVal)
+          currentVal = collection.formatIn(key[1], currentVal, request)
           if (currentVal === null) break
           switch (key[2] ?? 'eq') {
             case 'eq':
@@ -147,20 +148,20 @@ export default function (request, collection) {
             case 'gte':
             case 'lt':
             case 'lte':
-              const o = {}
+              o = {}
               o[key[1]] = {}
               o[key[1]][`$${key[2]}`] = currentVal
               query.push(o)
               break
             case 'in':
-              const o = {}
+              o = {}
               o[key[1]] = {
                 $in: currentVal.split(',')
               }
               query.push(o)
               break
             case 'contains':
-              const o = {}
+              o = {}
               o[key[1]] = {
                 $regex: currentVal,
                 $options: 'i'
