@@ -191,7 +191,9 @@ export default function (request, collection) {
       search = {
         $or: search
       }
-    else search = search[0]
+    else {
+      search = search[0]
+    }
     if (Object.keys(query).length) {
       query = {
         $and: [query, search]
