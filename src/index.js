@@ -38,7 +38,7 @@ const start = async _ => {
     await Role.ensureBasicRoles()
 
     // Setup routes
-    setupRoutes(app)
+    await setupRoutes(app)
 
     // Setup sockets
     setupSocket(app)

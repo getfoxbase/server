@@ -2,7 +2,10 @@ import Role from '../models/Role'
 import User from '../models/User'
 
 export default async function (req, res) {
-  if (req.headers.authorization === undefined) return
+  if (req.headers.authorization === undefined) {
+    req.role = await Role.getDefaultAnonymousRole()
+    return
+  }
 
   const [mode, token] = req.headers.authorization.split(' ')
 
@@ -25,7 +28,5 @@ export default async function (req, res) {
 
   if (req.user) {
     req.role = await req.user.getRole()
-  } else {
-    req.role = await Role.getDefaultAnonymousRole()
   }
 }

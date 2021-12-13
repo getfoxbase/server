@@ -1,4 +1,6 @@
 import Collection from '../models/Collection'
+import buildQuery from '../tools/query'
+import { $t } from '../tools/i18n'
 
 export default class Collections {
   static async list (request, reply) {
@@ -10,7 +12,7 @@ export default class Collections {
       if (!model) {
         reply.code(404).send(
           new Error(
-            $t('"{name}" collection does not exists', req.lang, {
+            $t('{{name}} collection does not exists', request.lang, {
               name: request.params.collectionName
             })
           )
@@ -18,7 +20,7 @@ export default class Collections {
         return
       }
 
-      const { page, limit, query, sort } = buildQuery(request)
+      const { page, limit, query, sort } = buildQuery(request, model)
       const list = await model.paginate(query, {
         page,
         limit,
@@ -43,7 +45,7 @@ export default class Collections {
     if (!model) {
       reply.code(404).send(
         new Error(
-          $t('"{name}" collection does not exists', req.lang, {
+          $t('"{name}" collection does not exists', request.lang, {
             name: request.params.collectionName
           })
         )
@@ -63,7 +65,7 @@ export default class Collections {
       if (!model) {
         reply.code(404).send(
           new Error(
-            $t('"{name}" collection does not exists', req.lang, {
+            $t('"{name}" collection does not exists', request.lang, {
               name: request.params.collectionName
             })
           )
@@ -98,7 +100,7 @@ export default class Collections {
       if (!model) {
         reply.code(404).send(
           new Error(
-            $t('"{name}" collection does not exists', req.lang, {
+            $t('"{name}" collection does not exists', request.lang, {
               name: request.params.collectionName
             })
           )
@@ -138,7 +140,7 @@ export default class Collections {
       if (!model) {
         reply.code(404).send(
           new Error(
-            $t('"{name}" collection does not exists', req.lang, {
+            $t('"{name}" collection does not exists', request.lang, {
               name: request.params.collectionName
             })
           )
@@ -178,7 +180,7 @@ export default class Collections {
       if (!model) {
         reply.code(404).send(
           new Error(
-            $t('"{name}" collection does not exists', req.lang, {
+            $t('"{name}" collection does not exists', request.lang, {
               name: request.params.collectionName
             })
           )

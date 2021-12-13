@@ -8,11 +8,12 @@ class Collection {
   }
 
   static async get (name) {
-    const model = mongoose.model(name)
-    if (model === undefined) {
-      return await this.setupModel(name)
-    }
-    return model
+    try {
+      const model = mongoose.model(name)
+      return model
+    } catch {}
+
+    return await this.setupModel(name)
   }
 
   static async setupModel (name) {

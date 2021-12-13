@@ -3,16 +3,18 @@ import { $t } from '../tools/i18n'
 export default (req, res, collectionName, accessType, document = null) => {
   if (req.role.allAccess) return false
 
-  if (req.role.collections[collectionName] === undefined) {
+  const collection = req.role.collections.get(collectionName)
+
+  if (collection === undefined) {
     res
       .code(403)
       .send(new Error($t('You do not have access to this resource', req.lang)))
     return true
   }
 
-  if (req.role.collections[collectionName][accessType]) return false
+  if (collection[accessType]) return false
 
-  if (req.role.collections[collectionName].author) {
+  if (collection.author) {
     req.limitToAuthor = true
 
     if (
