@@ -23,13 +23,6 @@ export default class UsersController {
   }
 
   static async get (request, reply) {
-    if (request.user.id !== request.params.userId && !request.user.admin) {
-      reply
-        .code(403)
-        .send(new Error($t('You cannot access this resource', request.lang)))
-      return
-    }
-
     try {
       const user = await User.findById(request.params.userId).exec()
       if (!user) {
