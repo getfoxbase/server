@@ -9,6 +9,7 @@
   "scripts": {
     "start": "yarn build && node dist/index.js",
     "dev": "cross-env DEBUG=true nodemon --exec babel-node src/index.js | pino-pretty -c -t",
+    "test": "cross-env DEBUG=true babel-node src/tests/parseFields.js | pino-pretty -c -t",
     "build": "babel src --out-dir dist"
   },
   "devDependencies": {
