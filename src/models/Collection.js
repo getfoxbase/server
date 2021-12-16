@@ -22,13 +22,15 @@ class Collection {
       return undefined
     }
 
+    let fieldConf = {}
+
     const schemaConf = {
       _author: {
         type: mongoose.ObjectId
       }
     }
     for (let key in conf.fields ?? {}) {
-      schemaConf[key] = {
+      fieldConf = {
         ...conf.fields[key],
         type: Types[conf.fields[key].type].getMongooseType(),
         of: Types[conf.fields[key].type].getMongooseOf(),
@@ -37,6 +39,8 @@ class Collection {
           conf.fields[key].index ??
           false
       }
+      if (fieldConf.isArray) fieldConf = [fieldConf]
+      schemaConf[key] = fieldConf
     }
 
     const schema = new Schema(schemaConf, {
@@ -58,26 +62,78 @@ class Collection {
       for (let key in data) {
         if (conf.fields[key] === undefined) continue
 
-        this.set(key, Types[conf.fields[key].type].in(data[key], request))
+        this.set(
+          key,
+          await Types[conf.fields[key].type].in(
+            data[key],
+            request,
+            conf.fields[key]
+          )
+        )
       }
     }
 
     schema.methods.export = async function (request, filter = null) {
-      let ret = {}
+      let ret = {
+        id: this.id
+      }
+      let docs = []
 
-      for (let key in conf.fields ?? {}) {
-        if (filter instanceof Array && filter.includes(key)) continue
+      if (filter !== null) {
+        for (let field of filter) {
+          if (conf.fields[field.field] === undefined) continue
 
-        ret[key] = Types[conf.fields[key].type].out(this.get(key), request)
+          switch (conf.fields[field.field].type) {
+            case 'one-to-one':
+              await this.populate(field.field)
+              ret[field.field] = await this.get(field.field).export(
+                request,
+                field.sub.length ? field.sub : null
+              )
+              break
+            case 'one-to-many':
+              await this.populate(field.field)
+              docs = []
+              for (let doc of this.get(field.field))
+                docs.push(
+                  await doc.export(request, field.sub.length ? field.sub : null)
+                )
+              ret[field.field] = docs
+              break
+            default:
+              ret[field.field] = await Types[conf.fields[field.field].type].out(
+                this.get(field.field),
+                request,
+                conf.fields[key]
+              )
+              break
+          }
+        }
+      } else {
+        for (let key in conf.fields ?? {}) {
+          ret[key] = await Types[conf.fields[key].type].out(
+            this.get(key),
+            request,
+            conf.fields[key]
+          )
+        }
       }
 
       return ret
     }
 
-    schema.statics.formatIn = function (key, value, request) {
+    schema.statics.formatIn = async function (key, value, request) {
       if (conf.fields[key] === undefined) return null
 
-      return Types[conf.fields[key].type].in(value, request)
+      return await Types[conf.fields[key].type].in(
+        value,
+        request,
+        conf.fields[key]
+      )
+    }
+
+    schema.statics.getConfiguration = function () {
+      return conf.fields[key]
     }
 
     schema.statics.canBeGeoSearched = function () {
@@ -140,6 +196,13 @@ const schema = new Schema(
           default: false
         },
         index: {
+          type: Boolean,
+          default: false
+        },
+        ref: {
+          type: String
+        },
+        isArray: {
           type: Boolean,
           default: false
         },

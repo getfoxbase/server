@@ -51,7 +51,7 @@ function parseFields (fields) {
   return words
 }
 
-export default function (request, collection = null) {
+export default async function (request, collection = null, initQuery = null) {
   let page = 1
   let limit = 20
   let query = []
@@ -63,6 +63,8 @@ export default function (request, collection = null) {
   let filter = null
   let o = {}
 
+  if (initQuery !== null) query.push(initQuery)
+
   for (let key in request.query) {
     let val = request.query[key]
     if (val instanceof Array === false) val = [val]
@@ -71,9 +73,11 @@ export default function (request, collection = null) {
     switch (key[1]) {
       case 'page':
         page = +val[0]
+        if (page < 1) page = 1
         break
       case 'limit':
         limit = +val[0]
+        if (limit < 1) limit = 1
         break
       case 'sort':
         sort = val[0]
@@ -195,7 +199,7 @@ export default function (request, collection = null) {
         break
       default:
         for (const currentVal of val) {
-          currentVal = collection.formatIn(key[1], currentVal, request)
+          currentVal = await collection.formatIn(key[1], currentVal, request)
           if (currentVal === null) break
           switch (key[2] ?? 'eq') {
             case 'eq':

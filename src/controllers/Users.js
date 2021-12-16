@@ -7,7 +7,7 @@ export default class UsersController {
     if (this.checkAccess(request, reply, '_users', 'read')) return
 
     try {
-      const { page, limit, query, sort } = buildQuery(request)
+      const { page, limit, query, sort } = await buildQuery(request)
       const users = await User.paginate(query, {
         page,
         limit,

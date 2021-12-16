@@ -5,6 +5,8 @@ import FloatType from './Float'
 import I18nTextType from './I18nText'
 import IntegerType from './Integer'
 import LatLngType from './LatLng'
+import OneToMany from './OneToMany'
+import OneToOne from './OneToOne'
 import TextType from './Text'
 
 export default {
@@ -15,5 +17,7 @@ export default {
   'i18n-text': I18nTextType,
   integer: IntegerType,
   latlng: LatLngType,
-  text: TextType
+  text: TextType,
+  'one-to-one': OneToOne,
+  'one-to-many': OneToMany
 }

@@ -1,9 +1,9 @@
 export default class Base {
-  static in (value) {
+  static in (value, fieldConf) {
     return value
   }
 
-  static out (value) {
+  static out (value, fieldConf) {
     return value
   }
 

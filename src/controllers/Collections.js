@@ -20,16 +20,150 @@ export default class Collections {
         return
       }
 
-      const { page, limit, query, sort } = buildQuery(request, model)
+      const { page, limit, query, sort, filter } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
       const list = await model.paginate(query, {
         page,
         limit,
         sort
       })
 
-      list.docs = list.docs.map(doc => doc.export())
+      const docs = []
+      for (let doc of list.docs) docs.push(await doc.export(request, filter))
+      list.docs = docs
 
       reply.send(list)
+    } catch (err) {
+      throw err
+    }
+  }
+
+  static async first (request, reply) {
+    if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
+      return
+
+    try {
+      const model = await Collection.get(request.params.collectionName)
+      if (!model) {
+        reply.code(404).send(
+          new Error(
+            $t('{{name}} collection does not exists', request.lang, {
+              name: request.params.collectionName
+            })
+          )
+        )
+        return
+      }
+
+      const { query, filter } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
+      const list = await model
+        .find(query, {
+          page: 1,
+          limit: 1,
+          sort: '_id'
+        })
+        .exec()
+
+      if (list.length === 0) {
+        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        return
+      }
+
+      reply.send(await list[0].export(request, filter))
+    } catch (err) {
+      throw err
+    }
+  }
+
+  static async last (request, reply) {
+    if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
+      return
+
+    try {
+      const model = await Collection.get(request.params.collectionName)
+      if (!model) {
+        reply.code(404).send(
+          new Error(
+            $t('{{name}} collection does not exists', request.lang, {
+              name: request.params.collectionName
+            })
+          )
+        )
+        return
+      }
+
+      const { query, filter } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
+      const list = await model
+        .find(query, {
+          page: 1,
+          limit: 1,
+          sort: '-_id'
+        })
+        .exec()
+
+      if (list.length === 0) {
+        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        return
+      }
+
+      reply.send(await list[0].export(request, filter))
+    } catch (err) {
+      throw err
+    }
+  }
+
+  static async count (request, reply) {
+    if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
+      return
+
+    try {
+      const model = await Collection.get(request.params.collectionName)
+      if (!model) {
+        reply.code(404).send(
+          new Error(
+            $t('{{name}} collection does not exists', request.lang, {
+              name: request.params.collectionName
+            })
+          )
+        )
+        return
+      }
+
+      const { query } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
+      const count = await model.count(query)
+
+      reply.send({ count })
     } catch (err) {
       throw err
     }
@@ -56,7 +190,7 @@ export default class Collections {
     const doc = await model.create(request.body)
 
     reply.code(201)
-    return doc.export()
+    return await doc.export(request)
   }
 
   static async get (request, reply) {
@@ -73,6 +207,15 @@ export default class Collections {
         return
       }
 
+      const { filter } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
       const doc = await model.findById(request.params.docId).exec()
       if (!doc) {
         reply.code(404).send(new Error($t('Resource not found', request.lang)))
@@ -87,7 +230,7 @@ export default class Collections {
       )
         return
       else {
-        reply.send(doc.export())
+        reply.send(await doc.export(request, filter))
       }
     } catch (err) {
       throw err
@@ -125,10 +268,10 @@ export default class Collections {
       )
         return
 
-      doc.applyValues(request.body, request, false)
+      await doc.applyValues(request.body, request, false)
       await doc.save()
 
-      reply.send(doc.export())
+      reply.send(await doc.export(request))
     } catch (err) {
       throw err
     }
@@ -165,10 +308,10 @@ export default class Collections {
       )
         return
 
-      doc.applyValues(request.body, request, true)
+      await doc.applyValues(request.body, request, true)
       await doc.save()
 
-      reply.send(doc.export())
+      reply.send(await doc.export(request))
     } catch (err) {
       throw err
     }
@@ -216,15 +359,95 @@ export default class Collections {
   }
 
   static async listRelation (request, reply) {
-    return 'ok'
-  }
-  static async createRelation (request, reply) {
-    return 'ok'
-  }
-  static async getRelation (request, reply) {
-    return 'ok'
-  }
-  static async deleteRelation (request, reply) {
-    return 'ok'
+    try {
+      const model = await Collection.get(request.params.collectionName)
+      if (!model) {
+        reply.code(404).send(
+          new Error(
+            $t('"{name}" collection does not exists', request.lang, {
+              name: request.params.collectionName
+            })
+          )
+        )
+        return
+      }
+
+      const { page, limit, query, sort, filter } = await buildQuery(
+        request,
+        model,
+        request.limitToAuthor
+          ? {
+              _author: request.user._id
+            }
+          : null
+      )
+
+      const doc = await model.findById(request.params.docId)
+      if (!doc) {
+        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        return
+      }
+
+      if (
+        this.checkAccess(
+          request,
+          reply,
+          request.params.collectionName,
+          'read',
+          doc
+        )
+      )
+        return
+      const conf = model.getConfiguration()
+      switch (conf.fields[request.params.relationName]?.type) {
+        case 'one-to-one':
+          await this.populate(request.params.relationName)
+          const rel = doc.get('request.params.relationName')
+          if (!rel) {
+            reply
+              .code(404)
+              .send(new Error($t('Resource not found', request.lang)))
+          } else {
+            reply.send(await rel.export(request, filter))
+          }
+          break
+        case 'one-to-many':
+          await this.populate([
+            {
+              path: request.params.relationName,
+              options: {
+                sort
+              },
+              match: query
+            }
+          ])
+          const rel = doc.get('request.params.relationName')
+          const docs = []
+          for (const r of rel) {
+            docs.push(await r.export(request, filter))
+          }
+          const totalPages = Math.ceil(docs.length / limit)
+          reply.send({
+            docs: docs.slice((page - 1) * limit, page * limit),
+            totalDocs: docs.length,
+            limit,
+            page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            nextPage: page < totalPages ? page + 1 : null,
+            hasPrevPage: page > 1,
+            prevPage: page > 1 ? page - 1 : null,
+            pagingCounter: (page - 1) * limit + 1
+          })
+          break
+        default:
+          reply
+            .code(404)
+            .send(new Error($t('Relation not found', request.lang)))
+          return
+      }
+    } catch (err) {
+      throw err
+    }
   }
 }
