@@ -21,20 +21,36 @@ module.exports.connect = async () => {
   await mongoose.connect(uri, mongooseOpts)
 
   await Role.ensureBasicRoles()
-  await User.createUser(
+
+  const user = await User.createUser(
     testConf.users.user.email,
     '',
     '',
     testConf.users.user.password,
     'en'
   )
-  await User.createUser(
+  user.pending = false
+  await user.save()
+
+  const pending = await User.createUser(
+    testConf.users.pending.email,
+    '',
+    '',
+    testConf.users.pending.password,
+    'en'
+  )
+  await user.save()
+
+  const admin = await User.createUser(
     testConf.users.admin.email,
     '',
     '',
     testConf.users.admin.password,
     'en'
   )
+  admin.role = 'admin'
+  admin.pending = false
+  await admin.save()
 }
 
 /**

@@ -193,7 +193,8 @@ const schema = new Schema(
       index: { unique: true }
     },
     role: {
-      type: String
+      type: String,
+      default: 'user'
     },
     password: {
       type: String
