@@ -1,30 +1,37 @@
 import { $t } from '../tools/i18n'
 
-export default (req, res, collectionName, accessType, document = null) => {
-  if (req.role.allAccess) return false
+export default (
+  request,
+  reply,
+  collectionName,
+  accessType,
+  document = null
+) => {
+  if (request.role.allAccess) return false
 
-  const collection = req.role.collections.get(collectionName)
+  const collection = request.role.collections.get(collectionName)
 
   if (collection === undefined) {
-    res
+    reply
       .code(403)
-      .send(new Error($t('You do not have access to this resource', req.lang)))
+      .send(
+        new Error($t('You do not have access to this resource', request.lang))
+      )
     return true
   }
 
   if (collection[accessType]) return false
 
   if (collection.author) {
-    req.limitToAuthor = true
-
+    request.limitToAuthor = true
     if (
       document !== null &&
-      (req.user === null || document._author.toString() !== req.user.id)
+      (request.user === null || document._author.toString() !== request.user.id)
     ) {
-      res
+      reply
         .code(403)
         .send(
-          new Error($t('You do not have access to this resource', req.lang))
+          new Error($t('You do not have access to this resource', request.lang))
         )
       return true
     }

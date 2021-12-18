@@ -3,6 +3,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import Role from '../models/Role'
 import User from '../models/User'
 import testConf from '../conf/tests'
+import Collection from '../models/Collection'
 
 let mongoServer = null
 
@@ -51,6 +52,83 @@ module.exports.connect = async () => {
   admin.role = 'admin'
   admin.pending = false
   await admin.save()
+
+  await Collection.create({
+    name: 'test',
+    _author: admin._id,
+    fields: {
+      myBoolean: {
+        type: 'boolean'
+      },
+      myDate: {
+        type: 'date'
+      },
+      myDecimal: {
+        type: 'decimal'
+      },
+      myFloat: {
+        type: 'float'
+      },
+      myI18nText: {
+        type: 'i18n-text'
+      },
+      myInteger: {
+        type: 'integer'
+      },
+      myLatLng: {
+        type: 'latlng'
+      },
+      myOneToOne: {
+        type: 'one-to-one',
+        ref: 'addresses'
+      },
+      myOneToMany: {
+        type: 'one-to-many',
+        ref: 'images'
+      },
+      myText: {
+        type: 'text'
+      }
+    }
+  })
+
+  await Collection.create({
+    name: 'addresses',
+    _author: admin._id,
+    fields: {
+      line1: {
+        type: 'text'
+      },
+      line2: {
+        type: 'text'
+      },
+      zipcode: {
+        type: 'text'
+      },
+      city: {
+        type: 'text'
+      },
+      state: {
+        type: 'text'
+      },
+      country: {
+        type: 'text'
+      }
+    }
+  })
+
+  await Collection.create({
+    name: 'images',
+    _author: admin._id,
+    fields: {
+      url: {
+        type: 'text'
+      },
+      name: {
+        type: 'text'
+      }
+    }
+  })
 }
 
 /**
