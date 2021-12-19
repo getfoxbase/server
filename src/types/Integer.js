@@ -2,7 +2,9 @@ import Base from './Base'
 
 export default class Integer extends Base {
   static in (value) {
-    return parseInt(`${value}`.replace(/\s/g, '').replace(/,/g, '.'))
+    const ret = parseInt(`${value}`.replace(/\s/g, '').replace(/,/g, '.'))
+    if (isNaN(ret)) return null
+    return ret
   }
 
   static getMongooseType () {

@@ -75,7 +75,6 @@ describe('Collections', _ => {
       userReq
     )
     await doc.save()
-    console.log(doc)
 
     expect(doc.id).toBeDefined()
     expect(doc.myOneToMany instanceof Array).toBe(true)

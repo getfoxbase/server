@@ -3,7 +3,9 @@ import Base from './Base'
 
 export default class Decimal extends Base {
   static in (value) {
-    return parseFloat(Float.in(value).toFixed(2))
+    value = Float.in(value)
+    if (value === null) return null
+    return parseFloat(value.toFixed(2))
   }
 
   static getMongooseType () {
