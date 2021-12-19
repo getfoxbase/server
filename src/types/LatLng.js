@@ -18,6 +18,15 @@ export default class LatLng extends Base {
     }
   }
 
+  static out (value) {
+    if (!value) return value
+
+    return {
+      lat: value.coordinates[1],
+      lng: value.coordinates[0]
+    }
+  }
+
   static getMongooseType () {
     return new Schema({
       type: {

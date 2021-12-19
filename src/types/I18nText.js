@@ -3,9 +3,9 @@ import Base from './Base'
 
 export default class I18nText extends Base {
   static in (value, request) {
-    if (typeof value === 'string') {
+    if (typeof value !== 'object') {
       const o = {}
-      o[request.lang] = value
+      o[request.lang] = '' + value
       return o
     }
     return value
