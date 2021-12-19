@@ -1,6 +1,7 @@
 import Collection from '../models/Collection'
 import buildQuery from '../tools/query'
 import { $t } from '../tools/i18n'
+import applyHateoas from '../tools/hateoas'
 
 export default class Collections {
   static async list (request, reply) {
@@ -39,7 +40,7 @@ export default class Collections {
       for (let doc of list.docs) docs.push(await doc.export(request, filter))
       list.docs = docs
 
-      reply.send(list)
+      reply.send(applyHateoas(list, request))
     } catch (err) {
       throw err
     }
@@ -467,7 +468,7 @@ export default class Collections {
             docs.push(await r.export(request, filter))
           }
           const totalPages = Math.ceil(docs.length / limit)
-          reply.send({
+          const list = {
             docs: docs.slice((page - 1) * limit, page * limit),
             totalDocs: docs.length,
             limit,
@@ -478,7 +479,9 @@ export default class Collections {
             hasPrevPage: page > 1,
             prevPage: page > 1 ? page - 1 : null,
             pagingCounter: (page - 1) * limit + 1
-          })
+          }
+
+          reply.send(applyHateoas(list, request))
           break
         default:
           reply

@@ -122,6 +122,10 @@ class Collection {
         }
       }
 
+      ret._links = {
+        self: `${request.protocol}://${request.hostname}/api/${name}/${this.id}`
+      }
+
       return ret
     }
 
