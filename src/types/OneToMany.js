@@ -1,6 +1,7 @@
 import Base from './Base'
 import mongoose from 'mongoose'
 import Collection from '../models/Collection'
+import checkAccess from '../decorators/checkAccess'
 
 export default class OneToMany extends Base {
   static getMongooseType () {
@@ -24,7 +25,7 @@ export default class OneToMany extends Base {
 
         // New object, create refered object
         if (
-          this.checkAccess(
+          checkAccess(
             request,
             { code: _ => {}, send: _ => {} },
             fieldConf.ref,
@@ -55,5 +56,11 @@ export default class OneToMany extends Base {
 
   static out (val) {
     return val.map(v => v._id.toString())
+  }
+
+  static eraseConfig () {
+    return {
+      isArray: true
+    }
   }
 }

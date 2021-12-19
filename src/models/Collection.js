@@ -32,17 +32,28 @@ class Collection {
         type: mongoose.ObjectId
       }
     }
-    for (let key in conf.fields ?? {}) {
-      fieldConf = {
-        ...conf.fields[key],
-        type: Types[conf.fields[key].type].getMongooseType(),
-        of: Types[conf.fields[key].type].getMongooseOf(),
-        index:
-          Types[conf.fields[key].type].getMongooseIndex() ??
-          conf.fields[key].index ??
-          false
+    for (const [key, field] of conf.fields.entries()) {
+      if (Types[field.type] === undefined) {
+        throw new Error(`Type "${field.type}" not found`)
       }
+
+      fieldConf = {
+        ...field.toJSON(),
+        type: Types[field.type].getMongooseType(),
+        of: Types[field.type].getMongooseOf(),
+        index: Types[field.type].getMongooseIndex() ?? field.index ?? false,
+        ...Types[field.type].eraseConfig()
+      }
+
+      if (
+        fieldConf.enum !== undefined &&
+        (fieldConf.enum instanceof Array === false ||
+          fieldConf.enum.length === 0)
+      )
+        delete fieldConf.enum
+
       if (fieldConf.isArray) fieldConf = [fieldConf]
+
       schemaConf[key] = fieldConf
     }
 
@@ -57,22 +68,20 @@ class Collection {
       eraseEverything = false
     ) {
       if (eraseEverything) {
-        for (let key in conf.fields ?? {}) {
+        for (let [key, field] of conf.fields.entries()) {
           this.set(key, undefined)
         }
       }
 
+      let value = null
       for (let key in data) {
-        if (conf.fields[key] === undefined) continue
-
-        this.set(
-          key,
-          await Types[conf.fields[key].type].in(
-            data[key],
-            request,
-            conf.fields[key]
-          )
+        if (conf.fields.has(key) === false) continue
+        value = await Types[conf.fields.get(key).type].in(
+          data[key],
+          request,
+          conf.fields.get(key)
         )
+        this.set(key, value)
       }
     }
 
@@ -84,9 +93,9 @@ class Collection {
 
       if (filter !== null) {
         for (let field of filter) {
-          if (conf.fields[field.field] === undefined) continue
+          if (conf.fields.get(field.field) === undefined) continue
 
-          switch (conf.fields[field.field].type) {
+          switch (conf.fields.get(field.field).type) {
             case 'one-to-one':
               await this.populate(field.field)
               ret[field.field] = await this.get(field.field).export(
@@ -104,21 +113,15 @@ class Collection {
               ret[field.field] = docs
               break
             default:
-              ret[field.field] = await Types[conf.fields[field.field].type].out(
-                this.get(field.field),
-                request,
-                conf.fields[key]
-              )
+              ret[field.field] = await Types[
+                conf.fields.get(field.field).type
+              ].out(this.get(field.field), request, conf.fields.get(key))
               break
           }
         }
       } else {
-        for (let key in conf.fields ?? {}) {
-          ret[key] = await Types[conf.fields[key].type].out(
-            this.get(key),
-            request,
-            conf.fields[key]
-          )
+        for (let [key, field] of conf.fields.entries()) {
+          ret[key] = await Types[field.type].out(this.get(key), request, field)
         }
       }
 
@@ -130,22 +133,22 @@ class Collection {
     }
 
     schema.statics.formatIn = async function (key, value, request) {
-      if (conf.fields[key] === undefined) return null
+      if (conf.fields.get(key) === undefined) return null
 
-      return await Types[conf.fields[key].type].in(
+      return await Types[conf.fields.get(key).type].in(
         value,
         request,
-        conf.fields[key]
+        conf.fields.get(key)
       )
     }
 
     schema.statics.getConfiguration = function () {
-      return conf.fields[key]
+      return conf.fields.get(key)
     }
 
     schema.statics.canBeGeoSearched = function () {
       for (let key in conf.fields ?? {}) {
-        if (conf.fields[key].type === 'latlng') return true
+        if (conf.fields.get(key).type === 'latlng') return true
       }
       return false
     }
@@ -153,7 +156,7 @@ class Collection {
     schema.statics.getGeoFields = function () {
       const ret = []
       for (let key in conf.fields ?? {}) {
-        if (conf.fields[key].type === 'latlng') ret.push(key)
+        if (conf.fields.get(key).type === 'latlng') ret.push(key)
       }
       return ret
     }
@@ -161,7 +164,7 @@ class Collection {
     schema.statics.getSearchFields = function () {
       const ret = []
       for (let key in conf.fields ?? {}) {
-        if (conf.fields[key].searchable) ret.push(key)
+        if (conf.fields.get(key).searchable) ret.push(key)
       }
       return ret
     }

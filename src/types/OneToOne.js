@@ -1,6 +1,7 @@
 import Base from './Base'
 import mongoose from 'mongoose'
 import Collection from '../models/Collection'
+import checkAccess from '../decorators/checkAccess'
 
 export default class OneToOne extends Base {
   static getMongooseType () {
@@ -14,7 +15,7 @@ export default class OneToOne extends Base {
 
       // New object, create refered object
       if (
-        this.checkAccess(
+        checkAccess(
           request,
           { code: _ => {}, send: _ => {} },
           fieldConf.ref,

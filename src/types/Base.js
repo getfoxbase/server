@@ -15,6 +15,10 @@ export default class Base {
     return String
   }
 
+  static eraseConfig () {
+    return {}
+  }
+
   static getMongooseOf () {
     return undefined
   }
