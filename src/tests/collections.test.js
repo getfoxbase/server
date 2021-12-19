@@ -34,6 +34,11 @@ describe('Collections', _ => {
     expect(model).toBeDefined()
   })
 
+  test('Does not have a "pwet" collection', async () => {
+    const ret = await Collection.get('pwet')
+    expect(ret).toBe(undefined)
+  })
+
   test('Handles models correctly', async () => {
     expect(model).toBeDefined()
 
