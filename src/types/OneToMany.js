@@ -33,12 +33,16 @@ export default class OneToMany extends Base {
         )
           continue
 
+        if (Collection.isProtected(fieldConf.ref)) continue
+
         const model = await Collection.get(fieldConf.ref)
         if (!model) {
           continue
         }
 
-        const doc = await model.create(val)
+        const doc = new model()
+        await doc.applyValues(val, request)
+        await doc.save()
         ret.push(doc._id)
         continue
       }

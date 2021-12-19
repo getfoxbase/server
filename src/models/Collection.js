@@ -2,9 +2,12 @@ import mongoose, { Schema } from 'mongoose'
 import Types from '../types'
 
 class Collection {
+  static isProtected (name) {
+    return ['_collections', '_users', '_roles'].includes(name)
+  }
+
   static clear (name) {
-    const protectedModels = ['_collections', '_users', '_roles']
-    if (protectedModels.includes(name) === false) mongoose.deleteModel(name)
+    if (!this.isProtected(name)) mongoose.deleteModel(name)
   }
 
   static async get (name) {

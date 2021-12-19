@@ -23,12 +23,16 @@ export default class OneToOne extends Base {
       )
         return null
 
+      if (Collection.isProtected(fieldConf.ref)) return null
+
       const model = await Collection.get(fieldConf.ref)
       if (!model) {
         return null
       }
 
-      const doc = await model.create(val)
+      const doc = new model()
+      await doc.applyValues(val, request)
+      await doc.save()
       return doc._id
     }
 
