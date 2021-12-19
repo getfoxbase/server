@@ -2,6 +2,7 @@ import db from './db'
 import testConf from '../conf/tests'
 import User from '../models/User'
 import Collection from '../models/Collection'
+import mongoose from 'mongoose'
 
 let user = null
 let userReq = null
@@ -36,6 +37,9 @@ describe('Collections', _ => {
   test('Handles models correctly', async () => {
     expect(model).toBeDefined()
 
+    let docs = await model.paginate()
+    expect(docs.docs.length).toBe(0)
+
     const doc = new model()
     await doc.applyValues(
       {
@@ -69,9 +73,25 @@ describe('Collections', _ => {
     console.log(doc)
 
     expect(doc.id).toBeDefined()
-
-    const docs = await model.paginate()
-    expect(docs.docs.length).toBe(1)
+    expect(doc.myOneToMany instanceof Array).toBe(true)
+    expect(doc.myOneToMany.length).toBe(1)
     expect(doc.myBoolean).toBe(true)
+    expect(doc.myDate.getFullYear()).toBe(2020)
+    expect(doc.myDecimal).toBe(12.35)
+    expect(doc.myFloat).toBe(12.345)
+    expect(doc.myInteger).toBe(12)
+    expect(doc.myI18nText.has('fr')).toBe(true)
+    expect(doc.myI18nText.get('fr')).toBe('Mon texte')
+    expect(doc.myLatLng.type).toBe('Point')
+    expect(doc.myOneToOne instanceof mongoose.Types.ObjectId).toBe(true)
+    expect(doc.myText).toBe('My uber text')
+
+    docs = await model.paginate()
+    expect(docs.docs.length).toBe(1)
+
+    await doc.delete(user._id)
+
+    docs = await model.paginate()
+    expect(docs.docs.length).toBe(0)
   })
 })
