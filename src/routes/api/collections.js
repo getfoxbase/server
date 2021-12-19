@@ -11,6 +11,5 @@ export default async function (app) {
   app.put('/:docId', Collections.replace)
   app.patch('/:docId', Collections.update)
   app.delete('/:docId', Collections.delete)
-
-  app.register(require('./relations'), { prefix: '/:docId/:relationName' })
+  app.get('/:docId/:relationName', Collections.listRelation)
 }
