@@ -10,6 +10,7 @@
     "start": "yarn build && node dist/index.js",
     "dev": "cross-env DEBUG=true nodemon --exec babel-node src/index.js | pino-pretty -c -t",
     "test": "jest",
+    "test-ci": "jest --ci",
     "build": "babel src --out-dir dist"
   },
   "devDependencies": {
