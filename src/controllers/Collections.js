@@ -193,6 +193,41 @@ export default class Collections {
     return await doc.export(request)
   }
 
+  static async createBulk (request, reply) {
+    if (
+      this.checkAccess(request, reply, request.params.collectionName, 'write')
+    )
+      return
+
+    const model = await Collection.get(request.params.collectionName)
+    if (!model) {
+      reply.code(404).send(
+        new Error(
+          $t('"{name}" collection does not exists', request.lang, {
+            name: request.params.collectionName
+          })
+        )
+      )
+      return
+    }
+
+    const statuses = []
+    const docs = []
+
+    for (let doc in request.body) {
+      try {
+        doc = await model.create(doc)
+        docs.push(doc.export(request))
+        statuses.push(true)
+      } catch (err) {
+        statuses.push(false)
+      }
+    }
+
+    reply.code(statuses.find(a => !a) ? 409 : 201)
+    return docs
+  }
+
   static async get (request, reply) {
     try {
       const model = await Collection.get(request.params.collectionName)
