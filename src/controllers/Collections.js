@@ -187,7 +187,9 @@ export default class Collections {
       return
     }
 
-    const doc = await model.create(request.body)
+    const doc = new model()
+    await doc.applyValues(request.body, request, true)
+    await doc.save()
 
     reply.code(201)
     return await doc.export(request)
@@ -213,10 +215,13 @@ export default class Collections {
 
     const statuses = []
     const docs = []
+    let doc = null
 
-    for (let doc in request.body) {
+    for (let body in request.body) {
       try {
-        doc = await model.create(doc)
+        doc = new model()
+        await doc.applyValues(body, request, true)
+        await doc.save()
         docs.push(doc.export(request))
         statuses.push(true)
       } catch (err) {
