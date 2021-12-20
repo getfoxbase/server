@@ -16,10 +16,31 @@ class Functions {
 
   async run (req, res) {
     const module = eval(this.code)
+
+    let doc = null
+    if (
+      req.params.collectionName !== undefined &&
+      req.params.docId !== undefined
+    ) {
+      const model = await Collection.get(req.params.collectionName)
+      if (!model) {
+        res.code(404).send(
+          new Error(
+            $t('"{name}" collection does not exists', req.lang, {
+              name: req.params.collectionName
+            })
+          )
+        )
+        return null
+      }
+      doc = await model.findById(req.params.docId).exec()
+    }
+
     let payload = {
       Collection,
       req,
-      res
+      res,
+      doc
     }
     if (this.entrypoint.trim() === '') {
       return await module(payload)
