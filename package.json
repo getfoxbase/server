@@ -11,7 +11,8 @@
     "dev": "cross-env DEBUG=true nodemon --exec babel-node src/index.js | pino-pretty -c -t",
     "test": "jest --verbose",
     "test-ci": "jest --ci",
-    "build": "babel src --out-dir dist"
+    "build": "babel src --out-dir dist",
+    "i18n": "vue-i18n-extract report --vueFiles \"./src/**/*.js\" --languageFiles \"./langs/*.json\" --separator=£ --add --remove && node tools/i18n-fill-blanks.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
@@ -27,6 +28,7 @@
     "pino-pretty": "^7.2.0"
   },
   "dependencies": {
+    "@foxbase/extensions": "^1.0.1",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "dayjs": "^1.10.7",
