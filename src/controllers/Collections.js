@@ -11,8 +11,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { page, limit, query, sort, filter } = await buildQuery(
@@ -47,8 +46,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { query, filter } = await buildQuery(
@@ -86,8 +84,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { query, filter } = await buildQuery(
@@ -125,8 +122,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { query } = await buildQuery(
@@ -154,7 +150,7 @@ export default class Collections {
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      reply.callNotFound()
+      return await this.notFound(request, reply)
       return
     }
 
@@ -174,7 +170,7 @@ export default class Collections {
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      reply.callNotFound()
+      return await this.notFound(request, reply)
       return
     }
 
@@ -202,8 +198,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { filter } = await buildQuery(
@@ -240,8 +235,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const doc = await model.findById(request.params.docId)
@@ -274,8 +268,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const doc = await model.findById(request.params.docId)
@@ -308,8 +301,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const doc = await model.findById(request.params.docId)
@@ -343,8 +335,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.callNotFound()
-        return
+        return await this.notFound(request, reply)
       }
 
       const { page, limit, query, sort, filter } = await buildQuery(
