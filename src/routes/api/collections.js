@@ -12,6 +12,8 @@ export default async function (app) {
   app.patch('/:docId', Collections.update)
   app.delete('/:docId', Collections.delete)
   app.get('/:docId/:relationName', Collections.listRelation)
-  app.get('/:docId/*', Collections.handleEndpoint)
-  app.get('/*', Collections.handleEndpoint)
+  app.post('/:docId/:relationName', Collections.handleEndpoint)
+  app.put('/:docId/:relationName', Collections.handleEndpoint)
+  app.patch('/:docId/:relationName', Collections.handleEndpoint)
+  app.delete('/:docId/:relationName', Collections.handleEndpoint)
 }

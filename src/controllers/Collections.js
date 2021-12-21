@@ -228,13 +228,18 @@ export default class Collections {
       )
       const doc = await model.findById(request.params.docId).exec()
       if (!doc) {
-        const endpoint = await Endpoint.handle(request)
+        const endpoint = await Endpoint.findOne({
+          collectionName: request.params.collectionName,
+          documentRelated: true,
+          endpoint: request.params.docId,
+          method: request.method
+        }).exec()
         if (!endpoint)
           reply
             .code(404)
             .send(new Error($t('Resource not found', request.lang)))
         else {
-          return endpoint.run(request, reply)
+          return await endpoint.run(request, reply)
         }
         return
       } else if (
@@ -267,13 +272,18 @@ export default class Collections {
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        const endpoint = await Endpoint.handle(request)
+        const endpoint = await Endpoint.findOne({
+          collectionName: request.params.collectionName,
+          documentRelated: true,
+          endpoint: request.params.docId,
+          method: request.method
+        }).exec()
         if (!endpoint)
           reply
             .code(404)
             .send(new Error($t('Resource not found', request.lang)))
         else {
-          return endpoint.run(request, reply)
+          return await endpoint.run(request, reply)
         }
         return
       }
@@ -310,13 +320,18 @@ export default class Collections {
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        const endpoint = await Endpoint.handle(request)
+        const endpoint = await Endpoint.findOne({
+          collectionName: request.params.collectionName,
+          documentRelated: true,
+          endpoint: request.params.docId,
+          method: request.method
+        }).exec()
         if (!endpoint)
           reply
             .code(404)
             .send(new Error($t('Resource not found', request.lang)))
         else {
-          return endpoint.run(request, reply)
+          return await endpoint.run(request, reply)
         }
         return
       }
@@ -353,13 +368,18 @@ export default class Collections {
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        const endpoint = await Endpoint.handle(request)
+        const endpoint = await Endpoint.findOne({
+          collectionName: request.params.collectionName,
+          documentRelated: true,
+          endpoint: request.params.docId,
+          method: request.method
+        }).exec()
         if (!endpoint)
           reply
             .code(404)
             .send(new Error($t('Resource not found', request.lang)))
         else {
-          return endpoint.run(request, reply)
+          return await endpoint.run(request, reply)
         }
         return
       }
@@ -467,13 +487,18 @@ export default class Collections {
           reply.send(applyHateoas(list, request))
           break
         default:
-          const endpoint = await Endpoint.handle(request)
+          const endpoint = await Endpoint.findOne({
+            collectionName: request.params.collectionName,
+            documentRelated: true,
+            endpoint: request.params.relationName,
+            method: request.method
+          }).exec()
           if (!endpoint)
             reply
               .code(404)
               .send(new Error($t('Relationship not found', request.lang)))
           else {
-            return endpoint.run(request, reply)
+            return await endpoint.run(request, reply)
           }
           return
       }
@@ -483,10 +508,15 @@ export default class Collections {
   }
 
   static async handleEndpoint (request, reply) {
-    const endpoint = await Endpoint.handle(request)
+    const endpoint = await Endpoint.findOne({
+      collectionName: request.params.collectionName,
+      documentRelated: true,
+      endpoint: request.params.relationName,
+      method: request.method
+    }).exec()
     if (!endpoint) reply.callNotFound()
     else {
-      return endpoint.run(request, reply)
+      return await endpoint.run(request, reply)
     }
   }
 }
