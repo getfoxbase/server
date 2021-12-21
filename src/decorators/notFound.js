@@ -1,9 +1,8 @@
 export default async (request, reply) => {
-  reply.code(404)
-
-  return {
-    message: `Route yay ${request.method}:${request.url} not found`,
-    error: 'Not Found',
-    statusCode: 404
-  }
+  if (!reply.sent)
+    reply.code(404).send({
+      message: `Route yay ${request.method}:${request.url} not found`,
+      error: 'Not Found',
+      statusCode: 404
+    })
 }

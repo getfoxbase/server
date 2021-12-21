@@ -12,7 +12,6 @@ export default (
   const collection = request.role.collections.get(collectionName)
 
   if (collection === undefined) {
-    reply.callNotFound()
     return true
   }
 

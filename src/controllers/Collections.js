@@ -6,7 +6,7 @@ import applyHateoas from '../tools/hateoas'
 export default class Collections {
   static async list (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return
+      return this.notFound(request, reply)
 
     try {
       const model = await Collection.get(request.params.collectionName)
@@ -41,7 +41,7 @@ export default class Collections {
 
   static async first (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return
+      return this.notFound(request, reply)
 
     try {
       const model = await Collection.get(request.params.collectionName)
@@ -79,7 +79,7 @@ export default class Collections {
 
   static async last (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return
+      return this.notFound(request, reply)
 
     try {
       const model = await Collection.get(request.params.collectionName)
@@ -117,7 +117,7 @@ export default class Collections {
 
   static async count (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return
+      return this.notFound(request, reply)
 
     try {
       const model = await Collection.get(request.params.collectionName)
@@ -146,7 +146,7 @@ export default class Collections {
     if (
       this.checkAccess(request, reply, request.params.collectionName, 'write')
     )
-      return
+      return this.notFound(request, reply)
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
