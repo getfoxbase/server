@@ -1,1 +1,19 @@
-{}
+{
+  "Collection not found": "Collection not found",
+  "Resource not found": "Resource not found",
+  "Relationship not found": "Relationship not found",
+  "Your credentials are not valid": "Your credentials are not valid",
+  "You are not authenticated": "You are not authenticated",
+  "You are not authenticated with a token": "You are not authenticated with a token",
+  "No such provider": "No such provider",
+  "Validation code is invalid": "Validation code is invalid",
+  "This account does not exists": "This account does not exists",
+  "Cannot change password, validation code is invalid or expired": "Cannot change password, validation code is invalid or expired",
+  "You do not have access to this resource": "You do not have access to this resource",
+  "\"{name}\" collection does not exists": "\"{name}\" collection does not exists",
+  "Unknown function \"{{name}}\"": "Unknown function \"{{name}}\"",
+  "You must add files to your function": "You must add files to your function",
+  "You must add repository to your function": "You must add repository to your function",
+  "Email is already used by another account. Try to sign in.": "Email is already used by another account. Try to sign in.",
+  "This account is not validated. Please check your mailbox and validate your account.": "This account is not validated. Please check your mailbox and validate your account."
+}

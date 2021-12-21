@@ -1,1 +1,19 @@
-{}
+{
+  "Collection not found": "Collection introuvable",
+  "Resource not found": "Ressource introuvable",
+  "Relationship not found": "Relation non trouvée",
+  "Your credentials are not valid": "Vos identifiants ne sont pas valides",
+  "You are not authenticated": "Vous n'êtes pas authentifié",
+  "You are not authenticated with a token": "Vous n'êtes pas authentifié avec un token",
+  "No such provider": "Pas de tel fournisseur",
+  "Validation code is invalid": "Le code de validation est invalide",
+  "This account does not exists": "Ce compte n'existe pas",
+  "Cannot change password, validation code is invalid or expired": "Impossible de changer le mot de passe, le code de validation est invalide ou a expiré",
+  "You do not have access to this resource": "Vous n'avez pas accès à cette ressource",
+  "\"{name}\" collection does not exists": "La collection \"{name}\" n'existe pas",
+  "Unknown function \"{{name}}\"": "Fonction inconnue \"{{name}}\"",
+  "You must add files to your function": "Vous devez ajouter des fichiers à votre fonction",
+  "You must add repository to your function": "Vous devez ajouter un référentiel à votre fonction",
+  "Email is already used by another account. Try to sign in.": "L'e-mail est déjà utilisé par un autre compte. Essayez de vous connecter.",
+  "This account is not validated. Please check your mailbox and validate your account.": "Ce compte n'est pas validé. Veuillez vérifier votre boîte mail et valider votre compte."
+}
