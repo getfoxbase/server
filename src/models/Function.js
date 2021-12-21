@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
+import cachegoose from 'cachegoose'
 import { Builder } from '@foxbase/extensions'
 import Collection from './Collection'
 
@@ -49,7 +50,9 @@ class Functions {
   }
 
   static async run (name, req, res) {
-    const func = await this.findOne({ name }).exec()
+    const func = await this.findOne({ name })
+      .cache(0, `function-${name}`)
+      .exec()
     if (!func) throw new Error($t('Unknown function "{{name}}"', { name }))
 
     return await func.run(req, res)
@@ -83,6 +86,9 @@ class Functions {
     }
     await func.build()
     await func.save()
+
+    // clear cache
+    cachegoose.clearCache(`function-${func.name}`)
 
     return {
       id: func.id,

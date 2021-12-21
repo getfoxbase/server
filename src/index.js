@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import cachegoose from 'cachegoose'
 import qs from 'qs'
 import Role from './models/Role'
 import setupRoutes from './routes'
@@ -29,6 +30,9 @@ app.register(require('fastify-cors'), {
 
 // Setup file uploading
 app.register(require('fastify-file-upload'))
+
+// Setup cache for mongoose queries
+cachegoose(mongoose)
 
 const start = async _ => {
   try {

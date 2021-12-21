@@ -31,6 +31,7 @@
     "@foxbase/extensions": "^1.0.1",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
+    "cachegoose": "^8.0.0",
     "dayjs": "^1.10.7",
     "dotenv": "^10.0.0",
     "fastify": "^3.24.1",
