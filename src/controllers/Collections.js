@@ -440,10 +440,11 @@ export default class Collections {
       )
         return
       const conf = model.getConfiguration()
+      let rel = null
       switch (conf.fields[request.params.relationName]?.type) {
         case 'one-to-one':
           await this.populate(request.params.relationName)
-          const rel = doc.get('request.params.relationName')
+          rel = doc.get('request.params.relationName')
           if (!rel) {
             reply
               .code(404)
@@ -462,7 +463,7 @@ export default class Collections {
               match: query
             }
           ])
-          const rel = doc.get('request.params.relationName')
+          rel = doc.get('request.params.relationName')
           const docs = []
           for (const r of rel) {
             docs.push(await r.export(request, filter))
