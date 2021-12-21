@@ -2,6 +2,7 @@ import I18nMiddleware from '../middlewares/i18n'
 import AuthMiddleware from '../middlewares/auth'
 import CheckAuthDecorator from '../decorators/checkAuth'
 import CheckAccessDecorator from '../decorators/checkAccess'
+import NotFoundDecorator from '../decorators/notFound'
 
 function decorators (app) {
   app.decorateRequest('lang', '')
@@ -11,6 +12,7 @@ function decorators (app) {
   app.decorateRequest('limitToAuthor', false)
   app.decorate('checkAuth', CheckAuthDecorator)
   app.decorate('checkAccess', CheckAccessDecorator)
+  app.decorate('notFound', NotFoundDecorator)
 }
 
 function middlewares (app) {
@@ -24,6 +26,7 @@ function routes (app) {
 
 export default function (app) {
   decorators(app)
+  app.setNotFoundHandler(app.notFound)
   middlewares(app)
   routes(app)
 }
