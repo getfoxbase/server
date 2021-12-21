@@ -11,13 +11,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('{{name}} collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -53,13 +47,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('{{name}} collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -98,13 +86,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('{{name}} collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -143,13 +125,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('{{name}} collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -178,13 +154,7 @@ export default class Collections {
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      reply.code(404).send(
-        new Error(
-          $t('"{name}" collection does not exists', request.lang, {
-            name: request.params.collectionName
-          })
-        )
-      )
+      reply.callNotFound()
       return
     }
 
@@ -204,13 +174,7 @@ export default class Collections {
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      reply.code(404).send(
-        new Error(
-          $t('"{name}" collection does not exists', request.lang, {
-            name: request.params.collectionName
-          })
-        )
-      )
+      reply.callNotFound()
       return
     }
 
@@ -238,13 +202,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('"{name}" collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -282,13 +240,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('"{name}" collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -322,13 +274,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('"{name}" collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -362,13 +308,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('"{name}" collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 
@@ -403,13 +343,7 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        reply.code(404).send(
-          new Error(
-            $t('"{name}" collection does not exists', request.lang, {
-              name: request.params.collectionName
-            })
-          )
-        )
+        reply.callNotFound()
         return
       }
 

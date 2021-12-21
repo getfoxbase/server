@@ -1,4 +1,4 @@
-export default (request, reply) => {
+export default async (request, reply) => {
   reply.code(404)
 
   return {
