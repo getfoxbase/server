@@ -12,6 +12,11 @@ export default (
   const collection = request.role.collections.get(collectionName)
 
   if (collection === undefined) {
+    reply
+      .code(403)
+      .send(
+        new Error($t('You do not have access to this resource', request.lang))
+      )
     return true
   }
 

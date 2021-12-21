@@ -2,16 +2,20 @@ import Collection from '../models/Collection'
 import buildQuery from '../tools/query'
 import { $t } from '../tools/i18n'
 import applyHateoas from '../tools/hateoas'
+import Endpoint from '../models/Endpoint'
 
 export default class Collections {
   static async list (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return this.notFound(request, reply)
+      return
 
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { page, limit, query, sort, filter } = await buildQuery(
@@ -41,12 +45,15 @@ export default class Collections {
 
   static async first (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return this.notFound(request, reply)
+      return
 
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { query, filter } = await buildQuery(
@@ -79,12 +86,15 @@ export default class Collections {
 
   static async last (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return this.notFound(request, reply)
+      return
 
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { query, filter } = await buildQuery(
@@ -117,12 +127,15 @@ export default class Collections {
 
   static async count (request, reply) {
     if (this.checkAccess(request, reply, request.params.collectionName, 'read'))
-      return this.notFound(request, reply)
+      return
 
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { query } = await buildQuery(
@@ -146,11 +159,11 @@ export default class Collections {
     if (
       this.checkAccess(request, reply, request.params.collectionName, 'write')
     )
-      return this.notFound(request, reply)
+      return
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      return await this.notFound(request, reply)
+      reply.code(404).send(new Error($t('Collection not found', request.lang)))
       return
     }
 
@@ -170,7 +183,7 @@ export default class Collections {
 
     const model = await Collection.get(request.params.collectionName)
     if (!model) {
-      return await this.notFound(request, reply)
+      reply.code(404).send(new Error($t('Collection not found', request.lang)))
       return
     }
 
@@ -198,7 +211,10 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { filter } = await buildQuery(
@@ -212,7 +228,15 @@ export default class Collections {
       )
       const doc = await model.findById(request.params.docId).exec()
       if (!doc) {
-        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        const endpoint = await Endpoint.handle(request)
+        if (!endpoint)
+          reply
+            .code(404)
+            .send(new Error($t('Resource not found', request.lang)))
+        else {
+          return endpoint.run(request, reply)
+        }
+        return
       } else if (
         this.checkAccess(
           request,
@@ -235,12 +259,22 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        const endpoint = await Endpoint.handle(request)
+        if (!endpoint)
+          reply
+            .code(404)
+            .send(new Error($t('Resource not found', request.lang)))
+        else {
+          return endpoint.run(request, reply)
+        }
         return
       }
 
@@ -268,12 +302,22 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        const endpoint = await Endpoint.handle(request)
+        if (!endpoint)
+          reply
+            .code(404)
+            .send(new Error($t('Resource not found', request.lang)))
+        else {
+          return endpoint.run(request, reply)
+        }
         return
       }
 
@@ -301,12 +345,22 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const doc = await model.findById(request.params.docId)
       if (!doc) {
-        reply.code(404).send(new Error($t('Resource not found', request.lang)))
+        const endpoint = await Endpoint.handle(request)
+        if (!endpoint)
+          reply
+            .code(404)
+            .send(new Error($t('Resource not found', request.lang)))
+        else {
+          return endpoint.run(request, reply)
+        }
         return
       }
 
@@ -335,7 +389,10 @@ export default class Collections {
     try {
       const model = await Collection.get(request.params.collectionName)
       if (!model) {
-        return await this.notFound(request, reply)
+        reply
+          .code(404)
+          .send(new Error($t('Collection not found', request.lang)))
+        return
       }
 
       const { page, limit, query, sort, filter } = await buildQuery(
@@ -410,13 +467,26 @@ export default class Collections {
           reply.send(applyHateoas(list, request))
           break
         default:
-          reply
-            .code(404)
-            .send(new Error($t('Relation not found', request.lang)))
+          const endpoint = await Endpoint.handle(request)
+          if (!endpoint)
+            reply
+              .code(404)
+              .send(new Error($t('Relationship not found', request.lang)))
+          else {
+            return endpoint.run(request, reply)
+          }
           return
       }
     } catch (err) {
       throw err
+    }
+  }
+
+  static async handleEndpoint (request, reply) {
+    const endpoint = await Endpoint.handle(request)
+    if (!endpoint) reply.callNotFound()
+    else {
+      return endpoint.run(request, reply)
     }
   }
 }
