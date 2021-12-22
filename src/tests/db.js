@@ -23,6 +23,30 @@ module.exports.connect = async () => {
 
   await Role.ensureBasicRoles()
 
+  await Role.create({
+    name: 'test',
+    slug: 'test',
+    defaultUserRole: true,
+    allAccess: false,
+    collections: {
+      _users: {
+        read: false,
+        write: false,
+        delete: false,
+        author: false,
+        admin: false
+      },
+      test: {
+        read: true,
+        write: true,
+        delete: true,
+        author: false,
+        admin: false
+      }
+    },
+    deletable: false
+  })
+
   const user = await User.createUser(
     testConf.users.user.email,
     '',
@@ -52,6 +76,17 @@ module.exports.connect = async () => {
   admin.role = 'admin'
   admin.pending = false
   await admin.save()
+
+  const tester = await User.createUser(
+    testConf.users.tester.email,
+    '',
+    '',
+    testConf.users.tester.password,
+    'en'
+  )
+  tester.role = 'test'
+  tester.pending = false
+  await tester.save()
 
   await Collection.create({
     name: 'test',

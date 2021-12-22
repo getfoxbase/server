@@ -39,5 +39,5 @@ export default (
     return false
   }
 
-  return false
+  return true
 }

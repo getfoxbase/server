@@ -11,6 +11,10 @@ export default {
     admin: {
       email: 'admin@test.com',
       password: 'fzeonhpogroireg'
+    },
+    tester: {
+      email: 'testWithoutAuthor@test.com',
+      password: 'fzeonhpogroireg'
     }
   }
 }

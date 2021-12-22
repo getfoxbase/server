@@ -5,8 +5,10 @@ import checkAccess from '../decorators/checkAccess'
 
 let user = null
 let admin = null
+let tester = null
 let userReq = null
 let adminReq = null
+let testerReq = null
 const res = {
   code: () => res,
   send: () => res
@@ -25,6 +27,11 @@ beforeAll(async () => {
     testConf.users.admin.password
   )
 
+  tester = await User.loginByPassword(
+    testConf.users.tester.email,
+    testConf.users.tester.password
+  )
+
   userReq = {
     user,
     role: await user.getRole()
@@ -33,6 +40,11 @@ beforeAll(async () => {
   adminReq = {
     user: admin,
     role: await admin.getRole()
+  }
+
+  testerReq = {
+    user: tester,
+    role: await tester.getRole()
   }
 })
 afterAll(async () => await db.closeDatabase())
@@ -89,24 +101,66 @@ describe('CheckAccess decorator', _ => {
     expect(ret).toBe(false)
   })
 
-  test('Should noy have read access with user with authored document but wrong user', async () => {
+  test('Should not have read access with user with authored document but wrong user', async () => {
     const ret = checkAccess(userReq, res, '_users', 'read', {
       _author: admin._id
     })
     expect(ret).toBe(true)
   })
 
-  test('Should noy have write access with user with authored document but wrong user', async () => {
+  test('Should not have write access with user with authored document but wrong user', async () => {
     const ret = checkAccess(userReq, res, '_users', 'write', {
       _author: admin._id
     })
     expect(ret).toBe(true)
   })
 
-  test('Should noy have delete access with user with authored document but wrong user', async () => {
+  test('Should not have delete access with user with authored document but wrong user', async () => {
     const ret = checkAccess(userReq, res, '_users', 'delete', {
       _author: admin._id
     })
     expect(ret).toBe(true)
+  })
+
+  test('Should not have read access with user with authored document but user have no author access', async () => {
+    const ret = checkAccess(testerReq, res, '_users', 'read', {
+      _author: admin._id
+    })
+    expect(ret).toBe(true)
+  })
+
+  test('Should not have write access with user with authored document but user have no author access', async () => {
+    const ret = checkAccess(testerReq, res, '_users', 'write', {
+      _author: admin._id
+    })
+    expect(ret).toBe(true)
+  })
+
+  test('Should not have delete access with user with authored document but user have no author access', async () => {
+    const ret = checkAccess(testerReq, res, '_users', 'delete', {
+      _author: admin._id
+    })
+    expect(ret).toBe(true)
+  })
+
+  test('Should have read access with user with authored document', async () => {
+    const ret = checkAccess(testerReq, res, 'test', 'read', {
+      _author: admin._id
+    })
+    expect(ret).toBe(false)
+  })
+
+  test('Should have write access with user with authored document', async () => {
+    const ret = checkAccess(testerReq, res, 'test', 'write', {
+      _author: admin._id
+    })
+    expect(ret).toBe(false)
+  })
+
+  test('Should have delete access with user with authored document', async () => {
+    const ret = checkAccess(testerReq, res, 'test', 'delete', {
+      _author: admin._id
+    })
+    expect(ret).toBe(false)
   })
 })
