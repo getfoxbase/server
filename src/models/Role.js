@@ -17,8 +17,7 @@ class Role {
     await this.ensureRole('admin', {
       name: 'Admin',
       allAccess: true,
-      collections: {},
-      deletable: false
+      collections: {}
     })
     await this.ensureRole('user', {
       name: 'User',
@@ -32,8 +31,7 @@ class Role {
           author: true,
           admin: false
         }
-      },
-      deletable: false
+      }
     })
     await this.ensureRole('anonymous', {
       name: 'Anonymous',
@@ -47,8 +45,7 @@ class Role {
           author: true,
           admin: false
         }
-      },
-      deletable: false
+      }
     })
   }
 
@@ -92,10 +89,6 @@ const schema = new Schema(
     allAccess: {
       type: Boolean,
       default: false
-    },
-    deletable: {
-      type: Boolean,
-      default: true
     },
     collections: {
       type: Map,
