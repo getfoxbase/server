@@ -76,7 +76,8 @@ const schema = new Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true
+      trim: true,
+      immutable: true
     },
     defaultAnonymousRole: {
       type: Boolean,
